@@ -1,0 +1,5 @@
+micronaut:
+    application:
+        name: ms2
+    server:
+        port: 9090
