@@ -1,0 +1,11 @@
+version: "3"
+services:
+  toxyproxy:
+    image: shopify/toxiproxy
+    ports:
+      - 8474:8474
+      - 20000:20000
+  ms1:
+    build: .
+    ports:
+      - 9090:9090
