@@ -58,6 +58,11 @@
       <scope>compile</scope>
     </dependency>
     <dependency>
+      <groupId>io.micronaut.configuration</groupId>
+      <artifactId>micronaut-netflix-hystrix</artifactId>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
       <groupId>io.micronaut</groupId>
       <artifactId>micronaut-inject-java</artifactId>
       <scope>provided</scope>

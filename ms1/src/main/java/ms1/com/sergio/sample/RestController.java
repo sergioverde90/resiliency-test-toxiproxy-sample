@@ -12,8 +12,7 @@ public class RestController {
     RestClient restClient;
 
     @Get
-    public String getSalue() {
-        System.out.println("restClient = " + restClient);
+    public String getSalute() {
         return restClient.salute();
     }
 
