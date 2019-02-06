@@ -6,8 +6,9 @@ import io.micronaut.http.client.annotation.Client;
 
 @HystrixCommand
 @Client("http://localhost:9090")
-public interface RestClient {
+public interface SaluteClient {
 
     @Get("/salute")
     String salute();
+
 }

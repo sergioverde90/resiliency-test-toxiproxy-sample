@@ -5,5 +5,8 @@ services:
     ports:
       - 8474:8474
       - 9090:9090
+      - 5432:5432
+  db:
+      image: postgres:9.5
   ms2:
     build: .
