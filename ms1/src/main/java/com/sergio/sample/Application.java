@@ -1,4 +1,4 @@
-package ms1;
+package com.sergio.sample;
 
 import io.micronaut.runtime.Micronaut;
 

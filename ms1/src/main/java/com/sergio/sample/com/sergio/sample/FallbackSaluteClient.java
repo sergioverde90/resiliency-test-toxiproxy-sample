@@ -1,4 +1,4 @@
-package ms1.com.sergio.sample;
+package com.sergio.sample.com.sergio.sample;
 
 import io.micronaut.retry.annotation.Fallback;
 

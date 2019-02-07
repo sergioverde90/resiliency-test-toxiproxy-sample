@@ -1,12 +1,21 @@
 version: "3"
 services:
-  toxyproxy:
+  toxiproxy:
     image: shopify/toxiproxy
     ports:
       - 8474:8474
       - 9090:9090
       - 5432:5432
+  curl:
+    image: appropriate/curl
+    depends_on:
+      - toxiproxy
+    command: "toxiproxy:8474/proxies -XPOST -d '{\"name\":\"postgres\", \"listen\":\"0.0.0.0:5432\", \"upstream\":\"db:5432\"}'"
   db:
       image: postgres:9.5
+      environment:
+        - POSTGRES_DB=ms1-db
+        - POSTGRES_USER=postgres
+        - POSTGRES_PASSWORD=postgres
   ms2:
     build: .

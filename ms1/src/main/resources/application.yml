@@ -3,7 +3,16 @@ micronaut:
         name: ms1
 datasources:
     default:
-        url: jdbc:postgresql://localhost:5432/somedb
+        url: jdbc:postgresql://localhost:5432/ms1-db
         username: postgres
         password: postgres
         driverClassName: org.postgresql.Driver
+jpa:
+    default:
+        packages-to-scan:
+            - 'com.sergio.sample'
+        properties:
+            hibernate:
+                hbm2ddl:
+                    auto: update
+                show_sql: true

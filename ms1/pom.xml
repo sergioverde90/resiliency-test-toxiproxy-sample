@@ -7,7 +7,7 @@
     <micronaut.version>1.0.4</micronaut.version>
     <jdk.version>11</jdk.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <exec.mainClass>ms1.Application</exec.mainClass>
+    <exec.mainClass>com.sergio.sample.Application</exec.mainClass>
   </properties>
   <repositories>
     <repository>
@@ -94,8 +94,8 @@
     <!-- Hikari jdbc-->
     <dependency>
       <groupId>io.micronaut.configuration</groupId>
-      <artifactId>micronaut-jdbc-hikari</artifactId>
-      <scope>runtime</scope>
+      <artifactId>micronaut-jdbc-tomcat</artifactId>
+      <scope>compile</scope>
     </dependency>
     <!-- https://mvnrepository.com/artifact/postgresql/postgresql -->
     <dependency>
@@ -103,7 +103,10 @@
       <artifactId>postgresql</artifactId>
       <version>42.2.5</version>
     </dependency>
-
+    <dependency>
+      <groupId>io.micronaut.configuration</groupId>
+      <artifactId>micronaut-hibernate-jpa</artifactId>
+    </dependency>
   </dependencies>
   <build>
     <plugins>

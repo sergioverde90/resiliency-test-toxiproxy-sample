@@ -1,4 +1,4 @@
-package ms1;
+package com.sergio.sample;
 
 import eu.rekawek.toxiproxy.Proxy;
 import eu.rekawek.toxiproxy.ToxiproxyClient;
@@ -17,14 +17,13 @@ import static org.junit.Assert.assertNotNull;
 
 public class ResiliencyTest {
 
-    private static final EmbeddedServer server = ApplicationContext.run(EmbeddedServer.class);;
+    private static final EmbeddedServer server = ApplicationContext.build().run(EmbeddedServer.class);;
     private static final HttpClient client = server.getApplicationContext().createBean(HttpClient.class, server.getURL());
 
     @BeforeClass
     public static void init() throws IOException {
         var toxiproxyClient = new ToxiproxyClient("localhost", 8474);
-        Proxy p = toxiproxyClient.createProxy("ms2Proxy", "toxyproxy:9090", "ms2:9090");
-        Proxy p2 = toxiproxyClient.createProxy("postgresProxy", "toxyproxy:5432", "db:5432");
+        Proxy p = toxiproxyClient.getProxy("postgres");
         p.toxics().latency("testLatency", ToxicDirection.DOWNSTREAM, 1000);
     }
 

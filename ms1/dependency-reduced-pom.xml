@@ -141,7 +141,7 @@
   </dependencyManagement>
   <properties>
     <micronaut.version>1.0.4</micronaut.version>
-    <exec.mainClass>ms1.Application</exec.mainClass>
+    <exec.mainClass>com.sergio.sample.Application</exec.mainClass>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <jdk.version>11</jdk.version>
   </properties>
