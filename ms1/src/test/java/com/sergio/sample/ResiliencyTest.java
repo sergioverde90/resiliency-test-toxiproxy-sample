@@ -17,14 +17,31 @@ import static org.junit.Assert.assertNotNull;
 
 public class ResiliencyTest {
 
+    private static ToxiproxyClient toxiproxyClient;
+    private static Proxy thirdPartyProxy;
+    private static Proxy postgresProxy;
+
+    static {
+        initProxies();
+    }
+
+    private static void initProxies() {
+        try {
+            toxiproxyClient = new ToxiproxyClient("localhost", 8474);
+            postgresProxy = toxiproxyClient.createProxy("postgres-proxy", "toxiproxy:5432", "db:5432");
+            thirdPartyProxy = toxiproxyClient.createProxy("ms2Proxy", "toxiproxy:9090", "ms2:9090");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     private static final EmbeddedServer server = ApplicationContext.build().run(EmbeddedServer.class);;
     private static final HttpClient client = server.getApplicationContext().createBean(HttpClient.class, server.getURL());
 
     @BeforeClass
     public static void init() throws IOException {
-        var toxiproxyClient = new ToxiproxyClient("localhost", 8474);
-        Proxy p = toxiproxyClient.getProxy("postgres");
-        p.toxics().latency("testLatency", ToxicDirection.DOWNSTREAM, 1000);
+
+        thirdPartyProxy.toxics().latency("testLatency", ToxicDirection.DOWNSTREAM, 100);
     }
 
     @Test
@@ -36,13 +53,18 @@ public class ResiliencyTest {
     }
 
     @AfterClass
-    public static void teardown() {
+    public static void teardown() throws IOException {
         if (server != null) {
             server.stop();
         }
         if (client != null) {
             client.stop();
         }
+
+        for (Proxy proxy : toxiproxyClient.getProxies()) {
+            proxy.delete();
+        }
+
     }
 
 }

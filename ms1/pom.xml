@@ -94,7 +94,7 @@
     <!-- Hikari jdbc-->
     <dependency>
       <groupId>io.micronaut.configuration</groupId>
-      <artifactId>micronaut-jdbc-tomcat</artifactId>
+      <artifactId>micronaut-jdbc-hikari</artifactId>
       <scope>compile</scope>
     </dependency>
     <!-- https://mvnrepository.com/artifact/postgresql/postgresql -->
