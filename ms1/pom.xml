@@ -97,12 +97,13 @@
       <artifactId>micronaut-jdbc-hikari</artifactId>
       <scope>compile</scope>
     </dependency>
-    <!-- https://mvnrepository.com/artifact/postgresql/postgresql -->
+    <!-- postgres driver -->
     <dependency>
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
       <version>42.2.5</version>
     </dependency>
+    <!-- micronaut jpa support -->
     <dependency>
       <groupId>io.micronaut.configuration</groupId>
       <artifactId>micronaut-hibernate-jpa</artifactId>

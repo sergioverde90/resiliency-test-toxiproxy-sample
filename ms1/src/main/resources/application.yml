@@ -7,6 +7,7 @@ datasources:
         username: postgres
         password: postgres
         driverClassName: org.postgresql.Driver
+        connectionTimeout: 5000
 jpa:
     default:
         packages-to-scan:
@@ -16,3 +17,4 @@ jpa:
                 hbm2ddl:
                     auto: update
                 show_sql: true
+                timeout: 100

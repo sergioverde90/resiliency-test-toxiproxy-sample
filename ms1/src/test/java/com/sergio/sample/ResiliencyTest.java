@@ -1,70 +1,97 @@
 package com.sergio.sample;
 
+import com.sergio.sample.com.sergio.sample.SomeService;
+import com.sergio.sample.com.sergio.sample.Transaction;
+import com.sergio.sample.com.sergio.sample.TransactionClient;
 import eu.rekawek.toxiproxy.Proxy;
 import eu.rekawek.toxiproxy.ToxiproxyClient;
 import eu.rekawek.toxiproxy.model.ToxicDirection;
 import io.micronaut.context.ApplicationContext;
-import io.micronaut.http.HttpRequest;
-import io.micronaut.http.client.HttpClient;
-import io.micronaut.runtime.server.EmbeddedServer;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertEquals;
 
 public class ResiliencyTest {
 
-    private static ToxiproxyClient toxiproxyClient;
-    private static Proxy thirdPartyProxy;
-    private static Proxy postgresProxy;
+    private UUID userId;
 
-    static {
-        initProxies();
-    }
+    private ToxiproxyClient toxiproxyClient;
+    private Proxy thirdPartyProxy;
+    private Proxy postgresProxy;
 
-    private static void initProxies() {
-        try {
-            toxiproxyClient = new ToxiproxyClient("localhost", 8474);
-            postgresProxy = toxiproxyClient.createProxy("postgres-proxy", "toxiproxy:5432", "db:5432");
-            thirdPartyProxy = toxiproxyClient.createProxy("ms2Proxy", "toxiproxy:9090", "ms2:9090");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+    private ApplicationContext context;
+    private SomeService someService;
+    private TransactionClient transactionsClient;
 
-    private static final EmbeddedServer server = ApplicationContext.build().run(EmbeddedServer.class);;
-    private static final HttpClient client = server.getApplicationContext().createBean(HttpClient.class, server.getURL());
+    @Before
+    public void init() {
 
-    @BeforeClass
-    public static void init() throws IOException {
+        userId = UUID.randomUUID();
 
-        thirdPartyProxy.toxics().latency("testLatency", ToxicDirection.DOWNSTREAM, 100);
+        // initialize toxiproxy
+        toxiproxyClient = new ToxiproxyClient("localhost", 8474);
+        thirdPartyProxy = initProxy(toxiproxyClient, "ms2-proxy", "toxiproxy:9090", "ms2:9090");
+        postgresProxy = initProxy(toxiproxyClient, "postgres-proxy", "toxiproxy:5432", "db:5432");
+
+        // initialize embedded server
+        context = ApplicationContext.build().start();
+        someService = context.getBean(SomeService.class);
+        transactionsClient = context.getBean(TransactionClient.class);
     }
 
     @Test
-    public void testHello() {
-        HttpRequest<String> request = HttpRequest.GET("/hello");
-        String body = client.toBlocking().retrieve(request);
-        assertNotNull(body);
-        System.out.println("body = " + body);
+    public void shouldOpenCircuitOpenedOnThirdPartyWhenNetworkFailure() throws IOException {
+        // GIVEN
+        thirdPartyProxy.delete(); // simulate network failure
+        // WHEN
+        List<Transaction> transactions = someService.createTransaction(userId);
+        // THEN
+        assertEquals(Collections.emptyList(), transactions);
     }
 
-    @AfterClass
-    public static void teardown() throws IOException {
-        if (server != null) {
-            server.stop();
-        }
-        if (client != null) {
-            client.stop();
-        }
+    @Test
+    public void shouldOpenCircuitOnThirdPartyWhenNetworkHighLatency() throws IOException {
+        // GIVEN
+        thirdPartyProxy.toxics().latency("high-latency", ToxicDirection.DOWNSTREAM, 10_000);
+        // WHEN
+        List<Transaction> transactions = someService.createTransaction(userId);
+        // THEN
+        assertEquals(Collections.emptyList(), transactions);
+    }
 
-        for (Proxy proxy : toxiproxyClient.getProxies()) {
-            proxy.delete();
-        }
+    @Test
+    public void shouldCompensateTransactionWhenDatabaseNetworkFail() throws IOException {
+        // GIVEN
+        transactionsClient.createTransaction(userId, new Transaction("sc", LocalDateTime.now()));
+        // WHEN
+        postgresProxy.delete();
+        someService.createTransaction(userId);
+        List<Transaction> transactions = transactionsClient.getNewTransactions(userId);
+        assertEquals(1, transactions.size());
+    }
 
+    @After
+    public void onTestDown() {
+        try { thirdPartyProxy.delete(); } catch (IOException ignored) {}
+        try { postgresProxy.delete(); } catch (IOException ignored) {}
+        if (context != null) { context.stop(); }
+    }
+
+    private static Proxy initProxy(ToxiproxyClient toxiproxyClient, String proxyName, String listen, String upstream) {
+        try {
+            return toxiproxyClient.createProxy(proxyName, listen, upstream);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
     }
 
 }
