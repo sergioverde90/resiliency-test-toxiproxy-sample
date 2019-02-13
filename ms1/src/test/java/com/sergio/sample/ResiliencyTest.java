@@ -53,7 +53,7 @@ public class ResiliencyTest {
         // GIVEN
         thirdPartyProxy.delete(); // simulate network failure
         // WHEN
-        List<Transaction> transactions = someService.createTransaction(userId);
+        List<Transaction> transactions = someService.getTransactions(userId);
         // THEN
         assertEquals(Collections.emptyList(), transactions);
     }
@@ -63,7 +63,7 @@ public class ResiliencyTest {
         // GIVEN
         thirdPartyProxy.toxics().latency("high-latency", ToxicDirection.DOWNSTREAM, 10_000);
         // WHEN
-        List<Transaction> transactions = someService.createTransaction(userId);
+        List<Transaction> transactions = someService.getTransactions(userId);
         // THEN
         assertEquals(Collections.emptyList(), transactions);
     }
@@ -71,10 +71,10 @@ public class ResiliencyTest {
     @Test
     public void shouldCompensateTransactionWhenDatabaseNetworkFail() throws IOException {
         // GIVEN
-        transactionsClient.createTransaction(userId, new Transaction("sc", LocalDateTime.now()));
+        transactionsClient.bindTransactionToUser(userId, new Transaction("sc", LocalDateTime.now()));
         // WHEN
         postgresProxy.delete();
-        someService.createTransaction(userId);
+        someService.createUserTransaction(userId, "new tx concept");
         List<Transaction> transactions = transactionsClient.getNewTransactions(userId);
         assertEquals(1, transactions.size());
     }

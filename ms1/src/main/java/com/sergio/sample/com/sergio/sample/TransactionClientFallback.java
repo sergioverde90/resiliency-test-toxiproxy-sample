@@ -20,7 +20,7 @@ public class TransactionClientFallback implements TransactionClient {
     }
 
     @Override
-    public UUID createTransaction(UUID userId, Transaction newTx) {
+    public UUID bindTransactionToUser(UUID userId, Transaction newTx) {
         LOG.warn("executing fallback method when create transaction");
         return null;
     }

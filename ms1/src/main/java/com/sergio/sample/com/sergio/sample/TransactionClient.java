@@ -19,7 +19,7 @@ public interface TransactionClient {
     List<Transaction> getNewTransactions(@PathVariable UUID userId);
 
     @Post("/{userId}")
-    UUID createTransaction(@PathVariable UUID userId, @Body Transaction newTx);
+    UUID bindTransactionToUser(@PathVariable UUID userId, @Body Transaction newTx);
 
     @Delete("/{userId}/{txId}")
     void removeTransaction(@PathVariable UUID userId, @PathVariable UUID txId);

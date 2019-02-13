@@ -1,10 +1,21 @@
 package com.sergio.sample.com.sergio.sample;
 
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
 import java.time.LocalDateTime;
 
+@Embeddable
+@Getter
+@EqualsAndHashCode
 public class Transaction {
 
+    @Column(name = "tx_date")
     private LocalDateTime date;
+
+    @Column(name = "tx_concept")
     private String concept;
 
     private Transaction() {}
@@ -12,14 +23,6 @@ public class Transaction {
     public Transaction(String concept, LocalDateTime date) {
         this.date = date;
         this.concept = concept;
-    }
-
-    public LocalDateTime getDate() {
-        return date;
-    }
-
-    public String getConcept() {
-        return concept;
     }
 
     @Override
