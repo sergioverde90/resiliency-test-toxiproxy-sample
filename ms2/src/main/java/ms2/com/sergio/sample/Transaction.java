@@ -11,15 +11,10 @@ public class Transaction {
 
     private Transaction() {}
 
-    public Transaction(String concept, LocalDateTime date) {
-        this.date = date;
+    public Transaction(String concept) {
+        this.id = UUID.randomUUID();
+        this.date = LocalDateTime.now();
         this.concept = concept;
-    }
-
-    public Transaction(UUID txId, Transaction other) {
-        this.id = txId;
-        this.date = other.date;
-        this.concept = other.concept;
     }
 
     public LocalDateTime getDate() {

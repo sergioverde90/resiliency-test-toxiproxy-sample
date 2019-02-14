@@ -1,4 +1,4 @@
-package com.sergio.sample.com.sergio.sample;
+package com.sergio.sample.com.sergio.sample.repository;
 
 import com.sergio.sample.com.sergio.sample.domain.User;
 import io.micronaut.spring.tx.annotation.Transactional;

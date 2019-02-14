@@ -1,4 +1,4 @@
-package com.sergio.sample.com.sergio.sample;
+package com.sergio.sample.com.sergio.sample.domain;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -6,11 +6,15 @@ import lombok.Getter;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Embeddable
-@Getter
+//@Getter
 @EqualsAndHashCode
 public class Transaction {
+
+    @Column(name = "tx_id")
+    private UUID id;
 
     @Column(name = "tx_date")
     private LocalDateTime date;
@@ -20,16 +24,23 @@ public class Transaction {
 
     private Transaction() {}
 
-    public Transaction(String concept, LocalDateTime date) {
-        this.date = date;
-        this.concept = concept;
-    }
-
     @Override
     public String toString() {
         return "{"
                 + "\"date\":" + date
                 + ", \"concept\":\"" + concept + "\""
                 + "}";
+    }
+
+    public UUID getId() {
+        return id;
+    }
+
+    public LocalDateTime getDate() {
+        return date;
+    }
+
+    public String getConcept() {
+        return concept;
     }
 }

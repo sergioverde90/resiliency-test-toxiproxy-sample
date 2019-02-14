@@ -1,6 +1,5 @@
 package com.sergio.sample.com.sergio.sample.domain;
 
-import com.sergio.sample.com.sergio.sample.Transaction;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 

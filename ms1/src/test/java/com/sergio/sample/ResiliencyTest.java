@@ -1,8 +1,9 @@
 package com.sergio.sample;
 
-import com.sergio.sample.com.sergio.sample.SomeService;
-import com.sergio.sample.com.sergio.sample.Transaction;
+import com.sergio.sample.com.sergio.sample.ConceptRequest;
 import com.sergio.sample.com.sergio.sample.TransactionClient;
+import com.sergio.sample.com.sergio.sample.domain.SomeService;
+import com.sergio.sample.com.sergio.sample.domain.Transaction;
 import eu.rekawek.toxiproxy.Proxy;
 import eu.rekawek.toxiproxy.ToxiproxyClient;
 import eu.rekawek.toxiproxy.model.ToxicDirection;
@@ -13,7 +14,6 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -71,7 +71,7 @@ public class ResiliencyTest {
     @Test
     public void shouldCompensateTransactionWhenDatabaseNetworkFail() throws IOException {
         // GIVEN
-        transactionsClient.bindTransactionToUser(userId, new Transaction("sc", LocalDateTime.now()));
+        transactionsClient.createTransaction(userId, new ConceptRequest("sc"));
         // WHEN
         postgresProxy.delete();
         someService.createUserTransaction(userId, "new tx concept");

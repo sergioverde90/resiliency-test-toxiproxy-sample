@@ -1,6 +1,8 @@
-package com.sergio.sample.com.sergio.sample;
+package com.sergio.sample.com.sergio.sample.domain;
 
-import com.sergio.sample.com.sergio.sample.domain.User;
+import com.sergio.sample.com.sergio.sample.ConceptRequest;
+import com.sergio.sample.com.sergio.sample.TransactionClient;
+import com.sergio.sample.com.sergio.sample.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,17 +27,14 @@ public class SomeService {
     }
 
     public void createUserTransaction(UUID someUserId, String concept) {
-
-        final var newTx = new Transaction(concept, LocalDateTime.now());
-        final var createdTransactionId = transactionsClient.bindTransactionToUser(someUserId, newTx); // 2º point of failure
-        if (createdTransactionId == null) return;
-
+        final Transaction newTx = transactionsClient.createTransaction(someUserId, new ConceptRequest(concept)); // 2º point of failure
+        LOG.info("transaction created = {}", newTx);
+        if (newTx == null) return;
         final var user = new User(someUserId, newTx);
         LOG.info("updating user transactions...");
-
         compensatingTransaction(
                 () -> userRepository.update(user), // 3º point of failure with compensating transaction
-                () -> transactionsClient.removeTransaction(someUserId, createdTransactionId)
+                () -> transactionsClient.removeTransaction(someUserId, newTx.getId())
         );
 
     }
@@ -44,7 +43,7 @@ public class SomeService {
         try {
             action.run();
         } catch (Exception e) {
-            LOG.warn("Error occurred. Compensating transactions...");
+            LOG.warn("Error occurred. Compensating transaction...");
             try { compensating.run(); } catch (Exception ignore) { }
         }
     }

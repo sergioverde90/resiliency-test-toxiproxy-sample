@@ -1,5 +1,7 @@
 package com.sergio.sample.com.sergio.sample;
 
+import com.sergio.sample.com.sergio.sample.domain.SomeService;
+import com.sergio.sample.com.sergio.sample.domain.Transaction;
 import io.micronaut.retry.annotation.Fallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +22,7 @@ public class TransactionClientFallback implements TransactionClient {
     }
 
     @Override
-    public UUID bindTransactionToUser(UUID userId, Transaction newTx) {
+    public Transaction createTransaction(UUID userId, ConceptRequest concept) {
         LOG.warn("executing fallback method when create transaction");
         return null;
     }

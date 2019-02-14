@@ -1,5 +1,6 @@
 package com.sergio.sample.com.sergio.sample;
 
+import com.sergio.sample.com.sergio.sample.domain.Transaction;
 import io.micronaut.configuration.hystrix.annotation.HystrixCommand;
 import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Delete;
@@ -19,7 +20,7 @@ public interface TransactionClient {
     List<Transaction> getNewTransactions(@PathVariable UUID userId);
 
     @Post("/{userId}")
-    UUID bindTransactionToUser(@PathVariable UUID userId, @Body Transaction newTx);
+    Transaction createTransaction(@PathVariable UUID userId, @Body ConceptRequest conceptRequest);
 
     @Delete("/{userId}/{txId}")
     void removeTransaction(@PathVariable UUID userId, @PathVariable UUID txId);

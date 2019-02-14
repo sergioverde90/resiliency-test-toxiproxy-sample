@@ -26,12 +26,12 @@ public class TransactionController {
     }
 
     @Post("/{userId}")
-    public HttpResponse<UUID> addNewTx(@PathVariable UUID userId, @Body Transaction tx) {
+    public HttpResponse<Transaction> addNewTx(@PathVariable UUID userId, @Body ConceptRequest request) {
         System.out.println("CREATING NEW TX");
-        final UUID id = UUID.randomUUID();
+        final var transaction = new Transaction(request.getConcept());
         TX_BY_USER.computeIfAbsent(userId, k -> new ArrayList<>());
-        TX_BY_USER.get(userId).add(new Transaction(id, tx));
-        return HttpResponse.created(id);
+        TX_BY_USER.get(userId).add(transaction);
+        return HttpResponse.created(transaction);
     }
 
     @Delete("/{userId}/{txId}")
