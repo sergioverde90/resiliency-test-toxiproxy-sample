@@ -14,7 +14,7 @@ public class UserRepository {
     EntityManager entityManager;
 
     @Transactional
-    public void update(User user) {
+    public void save(User user) {
         entityManager.persist(user);
     }
 }

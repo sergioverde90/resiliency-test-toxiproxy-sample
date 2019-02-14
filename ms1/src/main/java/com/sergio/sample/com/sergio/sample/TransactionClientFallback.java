@@ -24,7 +24,7 @@ public class TransactionClientFallback implements TransactionClient {
     @Override
     public Transaction createTransaction(UUID userId, ConceptRequest concept) {
         LOG.warn("executing fallback method when create transaction");
-        return null;
+        return Transaction.errorTransaction();
     }
 
     @Override

@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -28,12 +27,10 @@ public class SomeService {
 
     public void createUserTransaction(UUID someUserId, String concept) {
         final Transaction newTx = transactionsClient.createTransaction(someUserId, new ConceptRequest(concept)); // 2º point of failure
-        LOG.info("transaction created = {}", newTx);
-        if (newTx == null) return;
+        LOG.info("transaction created = {}, updating user transactions...", newTx);
         final var user = new User(someUserId, newTx);
-        LOG.info("updating user transactions...");
         compensatingTransaction(
-                () -> userRepository.update(user), // 3º point of failure with compensating transaction
+                () -> userRepository.save(user), // 3º point of failure with compensating transaction
                 () -> transactionsClient.removeTransaction(someUserId, newTx.getId())
         );
 

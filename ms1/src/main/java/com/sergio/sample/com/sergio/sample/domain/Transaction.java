@@ -1,7 +1,6 @@
 package com.sergio.sample.com.sergio.sample.domain;
 
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
@@ -9,9 +8,12 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Embeddable
-//@Getter
 @EqualsAndHashCode
 public class Transaction {
+
+    public enum TransactionStatus {
+        CREATED, NOT_CREATED
+    }
 
     @Column(name = "tx_id")
     private UUID id;
@@ -22,14 +24,14 @@ public class Transaction {
     @Column(name = "tx_concept")
     private String concept;
 
+    private TransactionStatus transactionStatus = TransactionStatus.CREATED;
+
     private Transaction() {}
 
-    @Override
-    public String toString() {
-        return "{"
-                + "\"date\":" + date
-                + ", \"concept\":\"" + concept + "\""
-                + "}";
+    public static Transaction errorTransaction() {
+        Transaction tx = new Transaction();
+        tx.transactionStatus = TransactionStatus.NOT_CREATED;
+        return tx;
     }
 
     public UUID getId() {
@@ -42,5 +44,19 @@ public class Transaction {
 
     public String getConcept() {
         return concept;
+    }
+
+    public TransactionStatus getTransactionStatus() {
+        return transactionStatus;
+    }
+
+    @Override
+    public String toString() {
+        return "{\"Transaction\":{"
+                + "\"id\":" + id
+                + ", \"date\":" + date
+                + ", \"concept\":\"" + concept + "\""
+                + ", \"transactionStatus\":\"" + transactionStatus + "\""
+                + "}}";
     }
 }

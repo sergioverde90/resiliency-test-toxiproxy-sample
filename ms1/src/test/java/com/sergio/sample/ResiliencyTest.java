@@ -69,14 +69,23 @@ public class ResiliencyTest {
     }
 
     @Test
-    public void shouldCompensateTransactionWhenDatabaseNetworkFail() throws IOException {
+    public void shouldExecuteFallbackWhenCreateTransactionError() throws IOException {
         // GIVEN
-        transactionsClient.createTransaction(userId, new ConceptRequest("sc"));
+        thirdPartyProxy.delete();
         // WHEN
-        postgresProxy.delete();
         someService.createUserTransaction(userId, "new tx concept");
         List<Transaction> transactions = transactionsClient.getNewTransactions(userId);
         assertEquals(1, transactions.size());
+    }
+
+    @Test
+    public void shouldCompensateTransactionWhenDatabaseNetworkFail() throws IOException {
+        // GIVEN
+        postgresProxy.delete();
+        // WHEN
+        someService.createUserTransaction(userId, "new tx concept");
+        // THEN
+        // TODO: assert has saved transaction with status error
     }
 
     @After
