@@ -74,8 +74,7 @@ public class ResiliencyTest {
         thirdPartyProxy.delete();
         // WHEN
         someService.createUserTransaction(userId, "new tx concept");
-        List<Transaction> transactions = transactionsClient.getNewTransactions(userId);
-        assertEquals(1, transactions.size());
+        // TODO: assert transaction created with status NOT_CREATED
     }
 
     @Test
@@ -85,7 +84,8 @@ public class ResiliencyTest {
         // WHEN
         someService.createUserTransaction(userId, "new tx concept");
         // THEN
-        // TODO: assert has saved transaction with status error
+        List<Transaction> transactions = transactionsClient.getNewTransactions(userId);
+        assertEquals(0, transactions.size());
     }
 
     @After
