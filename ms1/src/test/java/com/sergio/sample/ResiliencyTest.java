@@ -1,9 +1,10 @@
 package com.sergio.sample;
 
-import com.sergio.sample.com.sergio.sample.ConceptRequest;
 import com.sergio.sample.com.sergio.sample.TransactionClient;
 import com.sergio.sample.com.sergio.sample.domain.SomeService;
 import com.sergio.sample.com.sergio.sample.domain.Transaction;
+import com.sergio.sample.com.sergio.sample.domain.User;
+import com.sergio.sample.com.sergio.sample.repository.UserRepository;
 import eu.rekawek.toxiproxy.Proxy;
 import eu.rekawek.toxiproxy.ToxiproxyClient;
 import eu.rekawek.toxiproxy.model.ToxicDirection;
@@ -31,6 +32,7 @@ public class ResiliencyTest {
     private ApplicationContext context;
     private SomeService someService;
     private TransactionClient transactionsClient;
+    private UserRepository userRepository;
 
     @Before
     public void init() {
@@ -46,6 +48,7 @@ public class ResiliencyTest {
         context = ApplicationContext.build().start();
         someService = context.getBean(SomeService.class);
         transactionsClient = context.getBean(TransactionClient.class);
+        userRepository = context.getBean(UserRepository.class);
     }
 
     @Test
@@ -74,7 +77,9 @@ public class ResiliencyTest {
         thirdPartyProxy.delete();
         // WHEN
         someService.createUserTransaction(userId, "new tx concept");
-        // TODO: assert transaction created with status NOT_CREATED
+        // THEN
+        User user = userRepository.findById(userId);
+        assertEquals(Transaction.TransactionStatus.NOT_CREATED, user.getTransaction().getTransactionStatus());
     }
 
     @Test

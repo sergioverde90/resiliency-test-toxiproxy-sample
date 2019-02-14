@@ -6,6 +6,7 @@ import io.micronaut.spring.tx.annotation.Transactional;
 import javax.inject.Singleton;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.util.UUID;
 
 @Singleton
 public class UserRepository {
@@ -16,5 +17,10 @@ public class UserRepository {
     @Transactional
     public void save(User user) {
         entityManager.persist(user);
+    }
+
+    @Transactional
+    public User findById(UUID userId) {
+        return entityManager.find(User.class, userId);
     }
 }
