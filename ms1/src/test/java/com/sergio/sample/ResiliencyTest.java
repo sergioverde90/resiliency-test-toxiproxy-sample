@@ -72,6 +72,18 @@ public class ResiliencyTest {
     }
 
     @Test
+    public void shouldOpenCircuitOnThirdPartyWhenJitter() throws IOException {
+        someService.createUserTransaction(userId, "jitter concept");
+        // GIVEN
+        thirdPartyProxy.toxics().latency("latency-with-jitter", ToxicDirection.DOWNSTREAM, 10_000).setJitter(50_000);
+        // WHEN
+        for (int i = 0; i < 10; i++) {
+            List<Transaction> transactions = someService.getTransactions(userId);
+            System.out.println("transactions = " + transactions);
+        }
+    }
+
+    @Test
     public void shouldExecuteFallbackWhenCreateTransactionError() throws IOException {
         // GIVEN
         thirdPartyProxy.delete();
@@ -91,6 +103,20 @@ public class ResiliencyTest {
         // THEN
         List<Transaction> transactions = transactionsClient.getNewTransactions(userId);
         assertEquals(0, transactions.size());
+    }
+
+    @Test
+    public void shouldCompensateTransactionWhenJitter() throws IOException, InterruptedException {
+        // GIVEN
+        postgresProxy.toxics().latency("postgres-latencty", ToxicDirection.DOWNSTREAM, 10_000).setJitter(5000);
+        // WHEN
+        for (int i = 0; i < 3; i++) {
+            someService.createUserTransaction(userId, "new tx concept");
+            // THEN
+            List<Transaction> transactions = transactionsClient.getNewTransactions(userId);
+            assertEquals(0, transactions.size());
+            Thread.sleep(1000);
+        }
     }
 
     @After
